@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  
+  --color-gold-50: #fbf8f2;
+  --color-gold-100: #f5eedf;
+  --color-gold-200: #eadcb9;
+  --color-gold-300: #dac38c;
+  --color-gold-400: #c6a45f;
+  --color-gold-500: #b38b41;
+  --color-gold-600: #9c7333;
+  --color-gold-700: #815c28;
+  --color-gold-800: #6a4b22;
+  --color-gold-900: #573e1e;
+  --color-gold-950: #3c2912;
+  
+  --color-chocolate-50: #fbf9f8;
+  --color-chocolate-100: #f6f1ed;
+  --color-chocolate-200: #ecdfe5;
+  --color-chocolate-300: #dabfa8;
+  --color-chocolate-400: #c39c7b;
+  --color-chocolate-500: #ae7c58;
+  --color-chocolate-600: #9c6543;
+  --color-chocolate-700: #824f36;
+  --color-chocolate-800: #6a3e2d;
+  --color-chocolate-900: #563327;
+  --color-chocolate-950: #2d1812;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar to match the luxury theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #fbf9f8;
+}
+::-webkit-scrollbar-thumb {
+  background: #c6a45f;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b38b41;
+}

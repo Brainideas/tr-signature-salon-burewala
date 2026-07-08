@@ -1,0 +1,6 @@
+{
+  "name": "TR Signature Salon Burewala",
+  "description": "Premium beauty, hair, skin, facial, laser, and bridal services in Burewala, Pakistan. Featuring July Summer Deals, elegant interiors, and expert styling.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
