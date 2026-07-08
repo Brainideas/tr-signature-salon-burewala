@@ -25,7 +25,7 @@ import {
   Copy,
   ChevronRight
 } from 'lucide-react';
-import { SERVICES, DEALS, REVIEWS, GALLERY_ITEMS, SALON_IMAGES, Service, Deal } from './data';
+import { SERVICES, DEALS, REVIEWS, GALLERY_ITEMS, SALON_IMAGES, Service, Deal, BRANCHES, Branch } from './data';
 
 export default function App() {
   // Navigation & UI State
@@ -37,8 +37,10 @@ export default function App() {
   const [selectedDealCategory, setSelectedDealCategory] = useState<'skin_hair' | 'laser_body'>('skin_hair');
   const [selectedGalleryCategory, setSelectedGalleryCategory] = useState<string>('All');
   const [activeLightboxImage, setActiveLightboxImage] = useState<string | null>(null);
+  const [selectedReviewBranch, setSelectedReviewBranch] = useState<'All' | 'Burewala' | 'Vehari'>('All');
   
   // Appointment Form State
+  const [formBranch, setFormBranch] = useState('TR Signature Salon Burewala');
   const [formName, setFormName] = useState('');
   const [formPhone, setFormPhone] = useState('');
   const [formService, setFormService] = useState('');
@@ -109,6 +111,7 @@ export default function App() {
 
     const newAppointment = {
       id: Date.now().toString(),
+      branch: formBranch,
       name: formName,
       phone: formPhone,
       service: formService,
@@ -217,7 +220,11 @@ export default function App() {
 
   // Generate WhatsApp Direct URL
   const getWhatsAppLink = (app: any) => {
-    const baseText = `*TR Signature Salon Burewala - Appointment Inquiry*\n\n` +
+    const isVehari = app.branch && app.branch.toLowerCase().includes('vehari');
+    const waNumber = isVehari ? '923333336442' : '92673353535';
+    const branchName = app.branch || 'TR Signature Salon Burewala';
+
+    const baseText = `*${branchName} - Appointment Inquiry*\n\n` +
       `• *Name:* ${app.name}\n` +
       `• *Phone:* ${app.phone}\n` +
       `• *Service/Deal:* ${app.service}\n` +
@@ -225,8 +232,8 @@ export default function App() {
       `• *Preferred Time:* ${app.time}\n` +
       (app.message ? `• *Message:* ${app.message}\n` : '') +
       `\nHello! I would like to confirm my appointment slot. Please let me know if this timing is available. Thank you!`;
-    
-    return `https://wa.me/92673353535?text=${encodeURIComponent(baseText)}`;
+
+    return `https://wa.me/${waNumber}?text=${encodeURIComponent(baseText)}`;
   };
 
   // Categories list for services
@@ -243,25 +250,28 @@ export default function App() {
           <div className="flex items-center gap-4 text-[11px] sm:text-xs">
             <span className="flex items-center gap-1.5 text-stone-300">
               <MapPin className="w-3.5 h-3.5 text-gold-400" />
-              Defence Road, Burewala
+              Burewala & Vehari Branches
             </span>
             <span className="flex items-center gap-1.5 text-stone-300">
               <Clock className="w-3.5 h-3.5 text-gold-400" />
-              10:00 AM – 8:00 PM Daily
+              10:00 AM – 8:00 PM
             </span>
           </div>
-          <div className="flex items-center gap-4 text-[11px] sm:text-xs">
-            <span className="flex items-center gap-1.5 text-stone-300">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] sm:text-xs text-stone-300">
+            <span className="flex items-center gap-1">
               <Star className="w-3.5 h-3.5 text-gold-400 fill-gold-400" />
-              4.5 Stars (366 Google Reviews)
+              4.5 Stars (582+ Reviews)
             </span>
-            <a 
-              href="tel:+92673353535" 
-              className="flex items-center gap-1 hover:text-gold-300 transition-colors font-medium text-gold-400"
-            >
-              <Phone className="w-3.5 h-3.5" />
-              +92 67 3353535
-            </a>
+            <span className="text-stone-600 hidden sm:inline">|</span>
+            <div className="flex items-center gap-3">
+              <a href="tel:+92673353535" className="hover:text-gold-300 transition-colors font-semibold text-gold-400">
+                Burewala: +92 67 3353535
+              </a>
+              <span className="text-stone-700">|</span>
+              <a href="tel:+923333336442" className="hover:text-gold-300 transition-colors font-semibold text-gold-400">
+                Vehari: +92 333 3336442
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -280,7 +290,7 @@ export default function App() {
               </span>
             </div>
             <span className="text-[10px] tracking-[0.25em] text-gold-600 uppercase font-medium">
-              Burewala
+              Burewala & Vehari
             </span>
           </a>
 
@@ -293,7 +303,7 @@ export default function App() {
               { id: 'deals', label: 'Summer Deals' },
               { id: 'gallery', label: 'Gallery' },
               { id: 'reviews', label: 'Reviews' },
-              { id: 'contact', label: 'Find Us' },
+              { id: 'contact', label: 'Locations' },
             ].map((tab) => (
               <a
                 key={tab.id}
@@ -356,7 +366,7 @@ export default function App() {
                   { id: 'gallery', label: 'Gallery' },
                   { id: 'reviews', label: 'Reviews' },
                   { id: 'booking', label: 'Book Appointment' },
-                  { id: 'contact', label: 'Find Us' },
+                  { id: 'contact', label: 'Locations' },
                 ].map((tab) => (
                   <a
                     key={tab.id}
@@ -375,21 +385,42 @@ export default function App() {
                   </a>
                 ))}
                 <div className="pt-4 border-t border-stone-100 flex flex-col gap-2.5 px-1">
-                  <a
-                    href="tel:+92673353535"
-                    className="flex items-center justify-center gap-2 bg-stone-100 hover:bg-stone-200 text-stone-900 py-3.5 rounded-xl font-semibold text-xs uppercase tracking-wider transition-colors"
-                  >
-                    <Phone className="w-4 h-4 text-gold-600" />
-                    Call +92 67 3353535
-                  </a>
-                  <a
-                    href="https://wa.me/92673353535"
-                    target="_blank"
-                    className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-semibold text-xs uppercase tracking-wider transition-colors"
-                  >
-                    <MessageSquare className="w-4 h-4 fill-white" />
-                    WhatsApp Salon
-                  </a>
+                  <div className="grid grid-cols-2 gap-2">
+                    <a
+                      href="tel:+92673353535"
+                      className="flex items-center justify-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-900 py-3 rounded-lg font-semibold text-[11px] uppercase tracking-wider transition-colors"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-gold-600" />
+                      Burewala
+                    </a>
+                    <a
+                      href="tel:+923333336442"
+                      className="flex items-center justify-center gap-1.5 bg-stone-100 hover:bg-stone-200 text-stone-900 py-3 rounded-lg font-semibold text-[11px] uppercase tracking-wider transition-colors"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-gold-600" />
+                      Vehari
+                    </a>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <a
+                      href="https://wa.me/92673353535"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg font-semibold text-[11px] uppercase tracking-wider transition-colors"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5 fill-white" />
+                      WA Burewala
+                    </a>
+                    <a
+                      href="https://wa.me/923333336442"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg font-semibold text-[11px] uppercase tracking-wider transition-colors"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5 fill-white" />
+                      WA Vehari
+                    </a>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -424,7 +455,7 @@ export default function App() {
             >
               <Award className="w-4 h-4 text-gold-400" />
               <span className="text-gold-200 text-xs font-semibold uppercase tracking-wider">
-                Burewala's Top-Rated Luxury Beauty Studio
+                Top-Rated Luxury Beauty Studio in Burewala & Vehari
               </span>
             </motion.div>
 
@@ -434,8 +465,10 @@ export default function App() {
               transition={{ duration: 0.7, delay: 0.1 }}
               className="text-4xl sm:text-5xl lg:text-6xl font-serif text-white font-bold leading-tight tracking-tight"
             >
-              TR Signature <br />
-              <span className="text-gold-400 italic font-normal font-serif">Salon Burewala</span>
+              TR Signature Salon <br />
+              <span className="text-gold-400 italic font-normal font-serif text-3xl sm:text-4xl lg:text-5xl block mt-2">
+                Premium Beauty, Hair & Skin Services in Burewala & Vehari
+              </span>
             </motion.h1>
 
             <motion.p 
@@ -444,7 +477,7 @@ export default function App() {
               transition={{ duration: 0.7, delay: 0.2 }}
               className="text-stone-300 text-base sm:text-lg max-w-xl font-light leading-relaxed"
             >
-              Premium Beauty, Hair & Skin Services in Burewala. Experience professional salon care, luxury interiors, expert stylists, advanced facials, hair treatments, manicures, pedicures, massages, laser services, and bridal beauty services.
+              Experience professional salon care, luxury beauty services, advanced facials, hair treatments, mani-pedi, makeup, massage, and bridal beauty services at our Burewala and Vehari branches.
             </motion.p>
 
             <motion.div 
@@ -461,10 +494,11 @@ export default function App() {
                 Book Appointment
               </a>
               <a
-                href="tel:+92673353535"
+                href="#contact"
+                onClick={(e) => handleNavClick(e, 'contact')}
                 className="bg-transparent border border-white/30 text-white hover:bg-white/10 px-8 py-3.5 rounded-sm font-semibold tracking-wide text-sm uppercase transition-all"
               >
-                Call Now
+                Our Branches
               </a>
               <a
                 href="#deals"
@@ -485,15 +519,15 @@ export default function App() {
             >
               <div>
                 <span className="block text-2xl font-serif font-bold text-gold-400">4.5★</span>
-                <span className="text-[11px] text-stone-400 uppercase tracking-widest font-medium">366 reviews</span>
+                <span className="text-[11px] text-stone-400 uppercase tracking-widest font-medium">582+ reviews</span>
               </div>
               <div>
                 <span className="block text-2xl font-serif font-bold text-gold-400">100%</span>
                 <span className="text-[11px] text-stone-400 uppercase tracking-widest font-medium">Ladies-Only Care</span>
               </div>
               <div>
-                <span className="block text-2xl font-serif font-bold text-gold-400">Burewala</span>
-                <span className="text-[11px] text-stone-400 uppercase tracking-widest font-medium">Defence Road</span>
+                <span className="block text-2xl font-serif font-bold text-gold-400">2 Branches</span>
+                <span className="text-[11px] text-stone-400 uppercase tracking-widest font-medium">Burewala & Vehari</span>
               </div>
             </motion.div>
           </div>
@@ -526,7 +560,7 @@ export default function App() {
               <div className="bg-stone-900 text-white p-6 sm:p-7 rounded-2xl shadow-lg flex items-center justify-between border-l-4 border-gold-500">
                 <div className="space-y-1">
                   <p className="text-gold-400 font-serif italic text-lg">Pristine & Ladies-Only</p>
-                  <p className="text-xs text-stone-300 leading-relaxed font-light">Strict hygiene, absolute privacy, complete comfort, and hospital-grade sanitization.</p>
+                  <p className="text-xs text-stone-300 leading-relaxed font-light">Strict hygiene, absolute privacy, complete comfort, and careful sanitization.</p>
                 </div>
                 <div className="h-12 w-12 rounded-full bg-gold-950/50 flex items-center justify-center border border-gold-500/30 text-gold-400 shrink-0 ml-4">
                   <Sparkles className="w-5 h-5" />
@@ -540,16 +574,16 @@ export default function App() {
             <div className="space-y-2">
               <span className="text-xs font-semibold uppercase tracking-widest text-gold-600 block">About Our Salon</span>
               <h2 className="text-3xl sm:text-4xl font-serif text-stone-950 font-bold tracking-tight">
-                Crafting Timeless Beauty in Burewala
+                Crafting Timeless Beauty in Burewala & Vehari
               </h2>
             </div>
 
             <p className="text-stone-600 leading-relaxed font-light text-base">
-              TR Signature Salon Burewala offers a complete, high-end beauty experience with expert staff, a clean environment, and premium luxury interiors. Our salon is a private sanctuary where women can unwind and indulge in top-tier care.
+              TR Signature Salon offers a complete, high-end beauty experience with expert staff, clean environments, and premium luxury interiors. Our salons are private sanctuaries where women can unwind and indulge in top-tier care in both Burewala and Vehari.
             </p>
 
             <p className="text-stone-600 leading-relaxed font-light text-base">
-              We are recognized across Burewala for our exceptional precision **haircuts, restorative keratin treatments, multi-step hydra facials, gorgeous bridal makeups, pristine manicures and pedicures**, and soothing spa body massages. Every tool is thoroughly sanitized, and every product is hand-selected from the world's finest cosmetic lines.
+              We are recognized across Burewala and Vehari for our exceptional precision **haircuts, restorative keratin treatments, multi-step hydra facials, gorgeous bridal makeups, pristine manicures and pedicures**, and soothing spa body massages. Every tool is thoroughly sanitized, and every product is hand-selected from the world's finest cosmetic lines.
             </p>
 
             {/* Structured benefits list - Bento Grid Style */}
@@ -624,10 +658,10 @@ export default function App() {
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="text-xs font-semibold uppercase tracking-widest text-gold-600">Our Premium Menu</span>
             <h2 className="text-3xl sm:text-4xl font-serif text-stone-950 font-bold tracking-tight">
-              A Wide Range of Professional Services
+              Premium Beauty Menu in Burewala & Vehari
             </h2>
             <p className="text-stone-500 text-sm font-light leading-relaxed">
-              Find customized care for your hair, face, skin, hands, and body. Use the category filters or search instantly to find exactly what you are looking for.
+              Welcome to the best <strong>beauty salon in Burewala</strong> and premier <strong>beauty salon in Vehari</strong>. As <strong>TR Signature Salon Burewala</strong> and <strong>TR Signature Salon Vehari</strong>, we offer customized care for your hair, face, skin, hands, and body.
             </p>
           </div>
 
@@ -997,32 +1031,54 @@ export default function App() {
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="text-xs font-semibold uppercase tracking-widest text-gold-600">Customer Testimonials</span>
             <h2 className="text-3xl sm:text-4xl font-serif text-stone-950 font-bold tracking-tight">
-              4.5 Stars from 366 Google Reviews
+              4.5 Stars from 582 Google Reviews
             </h2>
             <div className="flex justify-center items-center gap-1.5">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className={`w-5 h-5 ${i < 4 ? 'text-gold-500 fill-gold-500' : 'text-stone-300 fill-stone-300'}`} />
               ))}
-              <span className="text-stone-700 font-bold text-sm ml-2">4.5 / 5.0 Google Rating</span>
+              <span className="text-stone-700 font-bold text-sm ml-2">4.5 / 5.0 Rating</span>
             </div>
             <p className="text-stone-500 text-sm font-light leading-relaxed">
-              Highly praised for **professional staff, flawless hair styling, expert hydra facials, gorgeous bridal makeups, and pristine, hygienic manicure/pedicure treatments**.
+              Highly praised across <strong>Burewala (366 reviews)</strong> and <strong>Vehari (216 reviews)</strong> for professional staff, flawless hair styling, expert hydra facials, gorgeous bridal makeups, and pristine, hygienic manicure/pedicure treatments.
             </p>
+          </div>
+
+          {/* Interactive Branch Filter Tabs */}
+          <div className="flex justify-center gap-2 border-b border-stone-200/60 pb-6">
+            {(['All', 'Burewala', 'Vehari'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setSelectedReviewBranch(tab)}
+                className={`px-5 py-2.5 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all ${
+                  selectedReviewBranch === tab
+                    ? 'bg-stone-950 text-white shadow-md'
+                    : 'bg-white text-stone-600 hover:bg-stone-100 border border-stone-200'
+                }`}
+              >
+                {tab === 'All' ? 'All Reviews (582)' : `${tab} Branch`}
+              </button>
+            ))}
           </div>
 
           {/* Reviews Grid - Bento Cards */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {REVIEWS.map(review => (
+            {REVIEWS.filter(review => selectedReviewBranch === 'All' || review.branch === selectedReviewBranch).map(review => (
               <div
                 key={review.id}
                 className="bg-white p-6 rounded-2xl border border-stone-200/60 shadow-sm flex flex-col justify-between hover:border-gold-400 hover:shadow-md hover:scale-[1.01] transition-all duration-300 bg-gradient-to-br from-white to-[#faf9f6]/40"
               >
                 <div className="space-y-4">
-                  {/* Stars */}
-                  <div className="flex items-center gap-1">
-                    {[...Array(review.rating)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 text-gold-500 fill-gold-500" />
-                    ))}
+                  {/* Stars & Branch badge */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-1">
+                      {[...Array(review.rating)].map((_, i) => (
+                        <Star key={i} className="w-3.5 h-3.5 text-gold-500 fill-gold-500" />
+                      ))}
+                    </div>
+                    <span className="bg-gold-50 text-gold-700 text-[9px] font-bold px-2 py-0.5 rounded border border-gold-200">
+                      {review.branch}
+                    </span>
                   </div>
 
                   {/* Comment */}
@@ -1148,6 +1204,20 @@ export default function App() {
             </h3>
 
             <form onSubmit={handleFormSubmit} className="space-y-4">
+              {/* Select Branch field */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-stone-700 block">Select Branch <span className="text-rose-500">*</span></label>
+                <select
+                  required
+                  value={formBranch}
+                  onChange={(e) => setFormBranch(e.target.value)}
+                  className="w-full text-xs px-4 py-3 border border-stone-200 rounded-xl bg-[#faf8f5] focus:bg-white focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/10 transition-all"
+                >
+                  <option value="TR Signature Salon Burewala">TR Signature Salon Burewala (Defence Road)</option>
+                  <option value="TR Signature Salon Vehari">TR Signature Salon Vehari (Near SK Mall)</option>
+                </select>
+              </div>
+
               {/* Name field */}
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-stone-700 block">Your Full Name <span className="text-rose-500">*</span></label>
@@ -1286,7 +1356,8 @@ export default function App() {
                           {app.status}
                         </span>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-1 text-xs text-stone-600 font-light">
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-x-6 gap-y-1 text-xs text-stone-600 font-light">
+                        <p>📍 Branch: <strong className="text-stone-900">{app.branch || 'TR Signature Salon Burewala'}</strong></p>
                         <p>📞 Phone: <strong>{app.phone}</strong></p>
                         <p>✨ Service: <strong className="text-gold-700">{app.service}</strong></p>
                         <p>📅 Date: <strong>{app.date}</strong></p>
@@ -1327,138 +1398,164 @@ export default function App() {
       </section>
 
       {/* Contact & Map Section */}
-      <section id="contact" className="py-20 sm:py-28 bg-white">
-        <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-12 gap-12 sm:gap-16 items-stretch">
-          {/* Contact Details Card */}
-          <div className="lg:col-span-5 space-y-8 flex flex-col justify-between">
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <span className="text-xs font-semibold uppercase tracking-widest text-gold-600 block">Find Us In Burewala</span>
-                <h2 className="text-3xl sm:text-4xl font-serif text-stone-950 font-bold tracking-tight">
-                  Visit Our Salon Today
-                </h2>
-              </div>
-
-              <p className="text-stone-600 font-light text-sm leading-relaxed">
-                We are conveniently located in the prime commercial zone of Defence Road, Burewala, Pakistan. Our facility offers a clean, luxury salon atmosphere with comfortable resting areas and designated stations.
-              </p>
-
-              {/* Listing particulars */}
-              <div className="space-y-4 text-sm text-stone-700">
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-gold-500 shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="font-bold">Address</h4>
-                    <p className="text-stone-500 text-xs font-light">Defence Road, Burewala, Punjab, Pakistan</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-gold-500 shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="font-bold">Phone Number</h4>
-                    <p className="text-stone-500 text-xs font-light">+92 67 3353535</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-gold-500 shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="font-bold">Opening Hours</h4>
-                    <p className="text-stone-500 text-xs font-light">Monday to Sunday, 10:00 AM – 8:00 PM</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <Info className="w-5 h-5 text-gold-500 shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="font-bold">Important Info</h4>
-                    <p className="text-stone-500 text-xs font-light">Appointments recommended. Cash-only payment. Restrooms available.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Direct Dial Action Box - Bento panel */}
-            <div className="bg-stone-950 text-white p-6 sm:p-7 rounded-2xl border-l-4 border-gold-500 space-y-4 shadow-md">
-              <p className="text-xs text-stone-300 font-light">Need to speak to a receptionist immediately?</p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <a
-                  href="tel:+92673353535"
-                  className="bg-gold-500 hover:bg-gold-400 text-white text-center text-xs font-bold uppercase tracking-wider px-5 py-3.5 rounded-lg transition-colors cursor-pointer"
-                >
-                  Call +92 67 3353535
-                </a>
-                <a
-                  href="https://wa.me/92673353535"
-                  target="_blank"
-                  className="bg-emerald-600 hover:bg-emerald-700 text-center text-white text-xs font-bold uppercase tracking-wider px-5 py-3.5 rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <MessageSquare className="w-4 h-4 fill-white" />
-                  WhatsApp Us
-                </a>
-              </div>
-            </div>
+      <section id="contact" className="py-20 sm:py-28 bg-white border-b border-stone-200/40">
+        <div className="max-w-7xl mx-auto px-6 space-y-12">
+          {/* Section Header */}
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <span className="text-xs font-semibold uppercase tracking-widest text-gold-600">Our Branches</span>
+            <h2 className="text-3xl sm:text-4xl font-serif text-stone-950 font-bold tracking-tight">
+              Visit Our Nearest Salon Location
+            </h2>
+            <p className="text-stone-500 text-sm font-light leading-relaxed">
+              We operate two premium, fully equipped luxury beauty studios in Burewala and Vehari. Experience state-of-the-art care, strict hygiene standards, and private ladies-only spaces.
+            </p>
           </div>
 
-          {/* Interactive Styled Google Map Mockup & Live Navigation block */}
-          <div className="lg:col-span-7 rounded-2xl overflow-hidden border border-stone-200 bg-[#faf9f6] flex flex-col shadow-md">
-            {/* Top map menu */}
-            <div className="bg-white px-4 py-3.5 border-b border-stone-200 flex justify-between items-center text-xs">
-              <span className="font-bold text-stone-800 flex items-center gap-1.5">
-                <Map className="w-4 h-4 text-gold-500" />
-                Defence Road, Burewala
-              </span>
-              <a
-                href="https://maps.google.com/?q=TR+Signature+Salon+Burewala+Defence+Road"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gold-600 hover:text-gold-800 font-bold tracking-wider uppercase flex items-center gap-1 cursor-pointer"
-              >
-                Open Google Maps
-                <ArrowRight className="w-3 h-3" />
-              </a>
-            </div>
+          {/* Branches Grid */}
+          <div className="grid md:grid-cols-2 gap-8 items-stretch">
+            {BRANCHES.map((branch) => {
+              const isVehari = branch.id === 'vehari';
+              const mapsSearchUrl = `https://maps.google.com/?q=${encodeURIComponent(branch.name + ' ' + branch.address)}`;
+              const landmark = isVehari 
+                ? '📍 Landmark: Near SK Mall, Defence View Housing, Vehari. Secure parking available.' 
+                : '📍 Landmark: Opposite popular fashion brand outlets on Defence Road, Burewala. Safe parking space available.';
 
-            {/* Simulated premium map visuals using Google-styled aesthetic */}
-            <div className="flex-grow p-8 flex flex-col justify-center items-center text-center relative bg-stone-100 min-h-[300px]">
-              {/* Grid backdrop indicating maps layout */}
-              <div className="absolute inset-0 opacity-15" style={{ 
-                backgroundImage: 'radial-gradient(#c6a45f 1px, transparent 1px)', 
-                backgroundSize: '16px 16px' 
-              }} />
+              return (
+                <div key={branch.id} className="bg-[#faf9f6] rounded-2xl border border-stone-200/60 overflow-hidden flex flex-col justify-between shadow-md hover:border-gold-400 hover:shadow-lg transition-all duration-300">
+                  {/* Top content */}
+                  <div className="p-6 sm:p-8 space-y-6">
+                    {/* Header */}
+                    <div className="flex justify-between items-start gap-4">
+                      <div>
+                        <span className="bg-gold-50 text-gold-700 text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wider">
+                          {branch.city} Branch
+                        </span>
+                        <h3 className="text-xl font-serif font-bold text-stone-950 mt-2">{branch.name}</h3>
+                      </div>
+                      <div className="flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-stone-100 shadow-sm shrink-0">
+                        <Star className="w-4 h-4 text-gold-400 fill-gold-400" />
+                        <span className="text-xs font-bold text-stone-950">{branch.rating}</span>
+                        <span className="text-[10px] text-stone-400">({branch.reviews})</span>
+                      </div>
+                    </div>
 
-              {/* Styled center PIN container */}
-              <div className="relative z-10 space-y-6 max-w-sm">
-                <div className="mx-auto w-16 h-16 rounded-full bg-gold-100 border border-gold-400 flex items-center justify-center shadow-md animate-bounce">
-                  <MapPin className="w-8 h-8 text-gold-600" />
-                </div>
-                
-                <div className="space-y-2 bg-white/95 p-5 rounded-xl shadow-md border border-stone-200">
-                  <h4 className="font-serif font-bold text-stone-950 text-sm">TR Signature Salon Burewala</h4>
-                  <p className="text-[11px] text-stone-500 font-light">Defence Road, opposite prime commercial centers, Burewala, Pakistan.</p>
-                  <div className="pt-2 flex justify-center gap-2">
-                    <span className="bg-stone-900 text-white text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">Ladies Salon</span>
-                    <span className="bg-gold-50 text-gold-700 text-[9px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">4.5 ★ Rating</span>
+                    <p className="text-stone-600 text-xs font-light leading-relaxed">
+                      Our facility in {branch.city} offers a clean, luxury salon atmosphere with comfortable resting areas, specialized service stations, and ladies-only security.
+                    </p>
+
+                    {/* Specifications list */}
+                    <div className="space-y-3.5 text-xs text-stone-700 font-light">
+                      <div className="flex items-start gap-3">
+                        <MapPin className="w-4 h-4 text-gold-500 shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="font-bold text-stone-950 text-[11px] uppercase tracking-wider">Address</h4>
+                          <p className="text-stone-500 mt-0.5">{branch.address}</p>
+                          {branch.plusCode && (
+                            <span className="inline-block bg-stone-100 text-stone-600 text-[10px] px-1.5 py-0.5 rounded mt-1 font-mono">
+                              Plus Code: {branch.plusCode}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Phone className="w-4 h-4 text-gold-500 shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="font-bold text-stone-950 text-[11px] uppercase tracking-wider">Phone Number</h4>
+                          <a href={branch.callLink} className="text-gold-600 hover:text-gold-700 transition-colors mt-0.5 block font-semibold">
+                            {branch.phone}
+                          </a>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Clock className="w-4 h-4 text-gold-500 shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="font-bold text-stone-950 text-[11px] uppercase tracking-wider">Opening Hours</h4>
+                          <p className="text-stone-500 mt-0.5">{branch.hours}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Info className="w-4 h-4 text-gold-500 shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="font-bold text-stone-950 text-[11px] uppercase tracking-wider">Amenities & Policy</h4>
+                          <p className="text-stone-500 mt-0.5">Appointments recommended • Cash-only payment • Restrooms available • 100% ladies-only privacy</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Highlights */}
+                    <div className="space-y-2 pt-2 border-t border-stone-200/60">
+                      <h4 className="font-bold text-stone-950 text-[11px] uppercase tracking-wider">Branch Specialties</h4>
+                      <div className="flex flex-wrap gap-1.5">
+                        {branch.highlights.map((highlight, idx) => (
+                          <span key={idx} className="bg-stone-100 text-stone-700 text-[10px] px-2.5 py-1 rounded-md">
+                            {highlight}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Simulated premium map visuals for this branch */}
+                  <div className="border-t border-stone-200 bg-stone-50 flex flex-col">
+                    <div className="p-6 flex flex-col justify-center items-center text-center relative bg-stone-100 min-h-[220px]">
+                      {/* Grid backdrop */}
+                      <div className="absolute inset-0 opacity-15" style={{ 
+                        backgroundImage: 'radial-gradient(#c6a45f 1px, transparent 1px)', 
+                        backgroundSize: '16px 16px' 
+                      }} />
+
+                      {/* Styled Pin */}
+                      <div className="relative z-10 space-y-4 max-w-sm">
+                        <div className="mx-auto w-12 h-12 rounded-full bg-gold-100 border border-gold-400 flex items-center justify-center shadow-sm animate-bounce" style={{ animationDuration: '3s' }}>
+                          <MapPin className="w-6 h-6 text-gold-600" />
+                        </div>
+                        
+                        <div className="bg-white/95 p-4 rounded-xl shadow-md border border-stone-200 max-w-xs mx-auto">
+                          <h4 className="font-serif font-bold text-stone-950 text-xs">{branch.name}</h4>
+                          <p className="text-[10px] text-stone-500 font-light mt-0.5">{branch.address}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions bar */}
+                    <div className="bg-white p-4 sm:p-5 border-t border-stone-200 flex flex-col sm:flex-row gap-3">
+                      <a
+                        href={branch.callLink}
+                        className="flex-1 bg-stone-950 hover:bg-stone-900 text-white text-center text-[11px] font-bold uppercase tracking-wider py-3.5 rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                        Call Branch
+                      </a>
+                      <a
+                        href={branch.whatsappLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-center text-[11px] font-bold uppercase tracking-wider py-3.5 rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5 fill-white" />
+                        WhatsApp
+                      </a>
+                      <a
+                        href={mapsSearchUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 bg-gold-500 hover:bg-gold-400 text-white text-center text-[11px] font-bold uppercase tracking-wider py-3.5 rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                      >
+                        <MapPin className="w-3.5 h-3.5" />
+                        Directions
+                      </a>
+                    </div>
+
+                    <div className="bg-stone-50 p-3 text-[10px] text-stone-400 text-center font-light border-t border-stone-200">
+                      {landmark}
+                    </div>
                   </div>
                 </div>
-
-                <a
-                  href="https://maps.google.com/?q=TR+Signature+Salon+Burewala+Defence+Road"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 bg-stone-900 hover:bg-gold-600 text-white text-xs font-semibold uppercase tracking-wider px-6 py-3.5 rounded-xl transition-all shadow-sm cursor-pointer"
-                >
-                  <MapPin className="w-3.5 h-3.5 text-gold-400" />
-                  Get Live Directions
-                </a>
-              </div>
-            </div>
-
-            {/* Bottom map info banner */}
-            <div className="bg-stone-50 p-4 text-xs text-stone-500 text-center font-light border-t border-stone-200">
-              📍 Landmark: Opposite popular fashion brand outlets on Defence Road, Burewala. Safe parking space available.
-            </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -1471,14 +1568,22 @@ export default function App() {
           <div className="lg:col-span-4 space-y-4">
             <div className="space-y-1">
               <span className="text-white text-xl font-serif font-bold tracking-tight">TR SIGNATURE SALON</span>
-              <span className="block text-[10px] tracking-[0.2em] text-gold-400 uppercase font-medium">Burewala, Pakistan</span>
+              <span className="block text-[10px] tracking-[0.2em] text-gold-400 uppercase font-medium">Burewala & Vehari, Pakistan</span>
             </div>
             <p className="text-stone-400 text-xs font-light leading-relaxed max-w-sm">
               We provide exclusive, ladies-only premium hair, skin, laser, and makeup treatment systems designed to emphasize your natural elegance.
             </p>
-            <div className="pt-2">
-              <p className="text-xs text-stone-500">📞 Call Reception: <strong className="text-gold-400">+92 67 3353535</strong></p>
-              <p className="text-xs text-stone-500">📍 Defence Road, Burewala</p>
+            <div className="pt-2 space-y-1.5 border-t border-white/5">
+              <div>
+                <p className="text-[11px] font-semibold text-white uppercase">TR Burewala</p>
+                <p className="text-xs text-stone-500">📞 <a href="tel:+92673353535" className="hover:text-gold-400 transition-colors">+92 67 3353535</a></p>
+                <p className="text-xs text-stone-500">📍 Defence Road, Burewala</p>
+              </div>
+              <div className="pt-1.5">
+                <p className="text-[11px] font-semibold text-white uppercase">TR Vehari</p>
+                <p className="text-xs text-stone-500">📞 <a href="tel:+923333336442" className="hover:text-gold-400 transition-colors">+92 333 3336442</a></p>
+                <p className="text-xs text-stone-500">📍 Near SK Mall, Defence View Housing, Vehari</p>
+              </div>
             </div>
           </div>
 
@@ -1515,7 +1620,7 @@ export default function App() {
               Our Commitment
             </h4>
             <p className="text-[11px] text-stone-400 font-light leading-relaxed">
-              We strictly adhere to top-tier disinfection guidelines. All cosmetic tools undergo single-use preparation or hospital-grade autoclaving. 100% safe, private environment for women.
+              We follow strict cleaning and sanitization routines. Tools are cleaned, disinfected, and prepared before services, with single-use items used where appropriate. A private and comfortable environment for women.
             </p>
             <div className="pt-2">
               <span className="text-[10px] text-white/50 block font-semibold uppercase tracking-wider">Rating Score</span>
@@ -1542,7 +1647,7 @@ export default function App() {
 
         {/* Bottom copyright line */}
         <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-stone-500">
-          <p>© {new Date().getFullYear()} TR Signature Salon Burewala. All Rights Reserved.</p>
+          <p>© {new Date().getFullYear()} TR Signature Salon (Burewala & Vehari). All Rights Reserved.</p>
           <p>Designed with luxury in mind for ladies beauty care.</p>
         </div>
       </footer>
